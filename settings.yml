@@ -1,0 +1,12 @@
+
+name: Platform
+tilesize: 64
+background:
+    color: darkblue
+screen:
+    width: 360
+    height: 480
+    fps: 60
+
+player:
+    layer: 2
