@@ -4,9 +4,70 @@ tilesize: 64
 background:
     color: darkblue
 screen:
-    width: 360
+    width: 1200
     height: 480
     fps: 60
 
+gravity: 100
+air_resistence: -5
+meter: 50  # meters to pixels
+
 player:
     layer: 2
+    color: yellow
+    width: 40
+    height: 50
+    weight: 500
+    mass: 75
+    pos:
+        x: 200
+        y: 50
+    speed:
+        walk: 300
+        running: 00
+    aceleration: 5000
+    jump: 1800
+    friction: -10
+
+ground:
+    layer: 1
+    height: 50
+    width: 3000
+    color: brown
+    friction: -5
+
+rocks:
+    layer: 1
+    rock1:
+        color: grey
+        width: 300
+        height: 250
+        pos:
+            x: 1000
+            y: 50
+    rock2:
+        color: grey
+        width: 60
+        height: 70
+        pos:
+            x: 1360
+            y: 50
+
+    rock3:
+        color: grey
+        width: 60
+        height: 70
+        pos:
+            x: 820
+            y: 50
+
+
+boxes:
+    layer: 1
+    box1:
+        color: (139,69,19)
+        width: 60
+        height: 70
+        pos:
+            x: 460
+            y: 50
