@@ -5,7 +5,7 @@ import yaml
 import json
 import pygame as pg
 from pygame.locals import Color as Col
-from functions import sign
+from functions import sign, backoff, backoff2, backoff3
 from Sprites.player import Player
 from Sprites.ground import Ground
 from Sprites.rock import Rock
@@ -103,45 +103,56 @@ class Game(object):
             self.player.touch_the_ground = False
         # player hit rocks:
         hits = pg.sprite.spritecollide(self.player, self.rocks, False)
+        print 'touch' if self.player.touch_the_ground else ''
         for rock in hits:
-            # print self.player.vel
-            # rock = hits[0]
-            print rock.rect.top, self.player.pos.y, self.player.rect.bottom
-            if rock.rect.left < self.player.pos.x < rock.rect.right:
-                self.player.pos.y = rock.rect.y
-            else:
-                if self.player.pos.x < rock.rect.left:
-                    self.player.pos.x =\
-                        rock.rect.left - self.player.rect.width / 2
-                if self.player.pos.x > rock.rect.right:
-                    self.player.pos.x =\
-                        rock.rect.right + self.player.rect.width / 2
-            if self.player.pos.y == rock.rect.top:
-                self.player.touch_the_ground = True
+            backoff3(self.player, rock)
         # player hits boxes
         hits = pg.sprite.spritecollide(self.player, self.boxes, False)
         if hits:
             box = hits[0]
-            if self.player.vel.x > 0:
-                box.pos.x = self.player.pos.x + self.player.rect.width / 2 + \
-                    box.rect.width / 2
-            if self.player.vel.x < 0:
-                box.pos.x = self.player.pos.x - self.player.rect.width / 2 - \
-                    box.rect.width / 2
-            box.rect.midbottom = box.pos
+            # if self.player.vel.x > 0:
+            #     box.pos.x = self.player.pos.x + self.player.rect.width / 2 + \
+            #         box.rect.width / 2
+            # if self.player.vel.x < 0:
+            #     box.pos.x = self.player.pos.x - self.player.rect.width / 2 - \
+            #         box.rect.width / 2
+            # box.rect.midbottom = box.pos
+            force = self.player.mass * self.player.acc.x
+            if box.hit_direction and sign(force) != box.hit_direction:
+                box.calc_friction()
+            print 3, 'force: %s' % force
+            print 4, 'box.static_friction: %s' % box.static_friction
+            if abs(force) <= abs(box.static_friction * -1):
+                print 1, 'rock'
+                backoff3(self.player, box)
+            else:
+                print 2, 'box'
+                if self.player.vel.x > 0:
+                    box.pos.x = self.player.pos.x + self.player.rect.width / 2 + \
+                        box.rect.width / 2
+                if self.player.vel.x < 0:
+                    box.pos.x = self.player.pos.x - self.player.rect.width / 2 - \
+                        box.rect.width / 2
+                self.player.acc.x -= sign(self.player.acc.x) * (box.static_friction)
+                box.rect.midbottom = box.pos
+
         # boxes hits rocks
         hits = pg.sprite.groupcollide(self.boxes, self.rocks, False, False)
-        for box, rock in hits.items():
-            print box, rock
-            rock = rock[0]
-            if box.pos.x + box.rect.width / 2 >\
-                    rock.pos.x - rock.rect.width / 2:
-                # box.pos.x = \
-                #     rock.pos.x - rock.rect.width / 2 - box.rect.width / 2
-                # the box became a rock:
-                Rock(self, rect=box.rect,
-                     pos=box.pos, image=box.image)
-                box.kill()
+        for box, rocks in hits.items():
+            print box, rocks
+            for rock in rocks:
+                print rock
+                box.hit_direction = sign(self.player.vel.x)
+                backoff3(box, rock)
+                box.static_friction = rock.static_friction
+            # rock = rock[0]
+            # if box.pos.x + box.rect.width / 2 >\
+            #         rock.pos.x - rock.rect.width / 2:
+            #     # box.pos.x = \
+            #     #     rock.pos.x - rock.rect.width / 2 - box.rect.width / 2
+            #     # the box became a rock:
+            #     Rock(self, rect=box.rect, pos=box.pos, image=box.image)
+            #     box.kill()
             box.rect.midbottom = box.pos
 
         # if player reaches 1/4 of screen:
