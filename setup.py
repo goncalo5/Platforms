@@ -5,11 +5,11 @@ import yaml
 import json
 import pygame as pg
 from pygame.locals import Color as Col
-from functions import sign, backoff, backoff2, backoff3
+from functions import sign, backoff, backoff3
 from Sprites.player import Player
 from Sprites.ground import Ground
-from Sprites.rock import Rock
-from Sprites.box import Box
+# from Sprites.rock import Rock
+from Sprites.obstacle import Box, Rock
 
 
 vec = pg.math.Vector2
@@ -51,6 +51,7 @@ class Game(object):
         # create Groups:
         self.rocks = pg.sprite.Group()
         self.boxes = pg.sprite.Group()
+        self.obstacles = pg.sprite.Group()
         # create sprites:
         self.player = Player(self)
         self.ground = Ground(self)
@@ -58,6 +59,8 @@ class Game(object):
         self.rock2 = Rock(self, 'rock2')
         self.rock3 = Rock(self, 'rock3')
         self.box1 = Box(self, 'box1')
+        self.box2 = Box(self, 'box2')
+        self.box3 = Box(self, 'box3')
 
     def run(self):
         # game loop - set  self.playing = False to end the game
@@ -92,85 +95,95 @@ class Game(object):
 
     def update(self):
         # update portion of the game loop
+
+        # print 1, 'self.player.touch_left', self.player.touch_left
+        # print 1, 'self.player.touch_right', self.player.touch_right
+        # print 1, 'self.player.touch_top', self.player.touch_top
+        # print 1, 'self.player.touch_bot', self.player.touch_bot
         self.all_sprites.update()
+
+        # reset touch:
+        self.player.reset_touch()
+
+        force = self.player.mass * self.player.acc.x
         # player hit ground
         if pg.sprite.collide_rect(self.player, self.ground):
             # self.player.rect.bottom = self.ground.rect.top
             self.player.pos.y = self.ground.rect.top + 1
             self.player.vel.y = 0
-            self.player.touch_the_ground = True
-        else:
-            self.player.touch_the_ground = False
-        # player hit rocks:
-        hits = pg.sprite.spritecollide(self.player, self.rocks, False)
-        print 'touch' if self.player.touch_the_ground else ''
-        for rock in hits:
-            backoff3(self.player, rock)
-        # player hits boxes
-        hits = pg.sprite.spritecollide(self.player, self.boxes, False)
-        if hits:
-            box = hits[0]
-            # if self.player.vel.x > 0:
-            #     box.pos.x = self.player.pos.x + self.player.rect.width / 2 + \
-            #         box.rect.width / 2
-            # if self.player.vel.x < 0:
-            #     box.pos.x = self.player.pos.x - self.player.rect.width / 2 - \
-            #         box.rect.width / 2
-            # box.rect.midbottom = box.pos
-            force = self.player.mass * self.player.acc.x
-            if box.hit_direction and sign(force) != box.hit_direction:
-                box.calc_friction()
-            print 3, 'force: %s' % force
-            print 4, 'box.static_friction: %s' % box.static_friction
-            if abs(force) <= abs(box.static_friction * -1):
-                print 1, 'rock'
-                backoff3(self.player, box)
+            self.player.touch_bot = self.ground
+        # player hit obstacles:
+        hits = pg.sprite.spritecollide(self.player, self.obstacles, False)
+        # print 'touch' if self.player.touch_the_ground else ''
+        for sprite in hits:
+            if sprite.hit_direction and sign(force) != sprite.hit_direction:
+                sprite.calc_friction()
+            if abs(force) <= abs(sprite.static_friction * -1):
+                backoff3(self.player, sprite)
             else:
-                print 2, 'box'
                 if self.player.vel.x > 0:
-                    box.pos.x = self.player.pos.x + self.player.rect.width / 2 + \
-                        box.rect.width / 2
+                    sprite.pos.x = self.player.pos.x + self.player.rect.width / 2 + \
+                        sprite.rect.width / 2
                 if self.player.vel.x < 0:
-                    box.pos.x = self.player.pos.x - self.player.rect.width / 2 - \
-                        box.rect.width / 2
-                self.player.acc.x -= sign(self.player.acc.x) * (box.static_friction)
-                box.rect.midbottom = box.pos
+                    sprite.pos.x = self.player.pos.x - self.player.rect.width / 2 - \
+                        sprite.rect.width / 2
+                self.player.acc.x -= sign(self.player.acc.x) * (sprite.static_friction)
+                sprite.rect.midbottom = sprite.pos
 
-        # boxes hits rocks
-        hits = pg.sprite.groupcollide(self.boxes, self.rocks, False, False)
-        for box, rocks in hits.items():
-            print box, rocks
-            for rock in rocks:
-                print rock
-                box.hit_direction = sign(self.player.vel.x)
-                backoff3(box, rock)
-                box.static_friction = rock.static_friction
-            # rock = rock[0]
-            # if box.pos.x + box.rect.width / 2 >\
-            #         rock.pos.x - rock.rect.width / 2:
-            #     # box.pos.x = \
-            #     #     rock.pos.x - rock.rect.width / 2 - box.rect.width / 2
-            #     # the box became a rock:
-            #     Rock(self, rect=box.rect, pos=box.pos, image=box.image)
-            #     box.kill()
-            box.rect.midbottom = box.pos
+        # # boxes hits rocks
+        # hits = pg.sprite.groupcollide(self.boxes, self.rocks, False, False)
+        # for box, rocks in hits.items():
+        #     for rock in rocks:
+        #         box.hit_direction = sign(self.player.vel.x)
+        #         backoff3(box, rock)
+        #         box.static_friction = rock.static_friction
+        #     box.rect.midbottom = box.pos
+
+        # obstacles hits other obstacles:
+        hits = pg.sprite.groupcollide(self.obstacles, self.obstacles, False, False)
+        for obstacle1, obstacles2 in hits.items():
+            for obstacle2 in obstacles2:
+                if obstacle1 is obstacle2:
+                    continue
+                print
+                print 3, 'self.box1.pos', self.box1.pos
+                print 4, 'self.box2.pos', self.box2.pos
+
+                obstacle1.hit_direction = sign(self.player.vel.x)
+                backoff(obstacle1, obstacle2)
+                obstacle1.static_friction = obstacle2.static_friction
+                # print 1, 'obstacle1.touch_left', obstacle1.touch_left
+                # print 1, 'obstacle1.touch_right', obstacle1.touch_right
+                # print 1, 'obstacle1.touch_top', obstacle1.touch_top
+                # print 1, 'obstacle1.touch_bot', obstacle1.touch_bot
+                # print 2, 'obstacle2.touch_left', obstacle2.touch_left
+                # print 2, 'obstacle2.touch_right', obstacle2.touch_right
+                # print 2, 'obstacle2.touch_top', obstacle2.touch_top
+                # print 2, 'obstacle2.touch_bot', obstacle2.touch_bot
+
+                print 5, 'self.box1.pos', self.box1.pos
+                print 6, 'self.box2.pos', self.box2.pos
+            obstacle1.rect.midbottom = obstacle1.pos
 
         # if player reaches 1/4 of screen:
         def handle_scroll():
             direction = sign(self.player.vel.x)
             scroll = -max(abs(self.player.vel.x), 2) * self.dt * direction
+            self.ground.pos.x += scroll
             for rock in self.rocks:
                 rock.pos.x += scroll
             for box in self.boxes:
                 box.pos.x += scroll
             self.player.pos.x += scroll
-
         if self.player.pos.x > self.width * 3 / 4 and self.player.vel.x > 0:
             handle_scroll()
         if self.player.pos.x < self.width / 4 and self.player.vel.x < 0:
             handle_scroll()
 
+        # update positions to draw:
         self.player.rect.midbottom = self.player.pos
+        for obstacle in self.obstacles:
+            obstacle.rect.midbottom = obstacle.pos
 
     def draw(self):
         caption = '%s - fps: %.4s' % (self.s('name'), self.clock.get_fps())

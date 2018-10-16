@@ -23,11 +23,17 @@ class Player(pg.sprite.Sprite):
         self.mass = self.s('mass')
         self.weight = self.mass * game.settings['gravity']
         # self.weight = self.s('weight')
-        self.touch_the_ground = False
+        self.reset_touch()
+
+    def reset_touch(self):
+        self.touch_left = None
+        self.touch_right = None
+        self.touch_top = None
+        self.touch_bot = None
 
     def events(self):
         keys = pg.key.get_pressed()
-        if self.touch_the_ground:
+        if self.touch_bot:
             if keys[pg.K_LEFT]:
                 self.vel.x += -self.s('speed')['running']
                 self.acc.x += -self.s('aceleration')
@@ -42,11 +48,8 @@ class Player(pg.sprite.Sprite):
         # print 'pos: %s' % self.pos
         # print 'vel: %s' % self.vel
         # print 'acc: %s' % self.acc
-        print 1, self.touch_the_ground
         self.acc.x = 0
-        self.acc.y = 0 if self.touch_the_ground else self.weight
-        print 15, self.weight
-        print 2, self.pos, self.vel, self.acc
+        self.acc.y = 0 if self.touch_bot else self.weight
         # print 2
         # print 'pos: %s' % self.pos
         # print 'vel: %s' % self.vel
@@ -57,18 +60,16 @@ class Player(pg.sprite.Sprite):
         # print 'vel: %s' % self.vel
         # print 'acc: %s' % self.acc
         # aplly the friction
-        if self.touch_the_ground:
+        if self.touch_bot:
             self.acc.x += self.vel.x * self.game.settings['air_resistence']
-        print 4, self.pos, self.vel, self.acc
+        self.acc += self.vel * abs(self.game.settings['air_resistence']) * -1
         # print 'pos: %s' % self.pos
         # print 'vel: %s' % self.vel
         # print 'acc: %s' % self.acc
         # kinematic equations:
         self.vel += self.acc * self.game.dt
-        print 5, self.pos, self.vel, self.acc
         self.pos += self.vel * self.game.dt + self.acc * self.game.dt ** 2 / 2.
 
-        print 6, self.pos, self.vel, self.acc
         if self.pos.x > self.game.width - 100:
             self.pos.x = 0
 
@@ -76,7 +77,6 @@ class Player(pg.sprite.Sprite):
         if abs(self.vel.x) < .5:
             self.vel.x = 0
 
-        # exit(0)
         self.rect.midbottom = self.pos
         # print 5
         # print 'pos: %s' % self.pos

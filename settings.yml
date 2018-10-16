@@ -9,7 +9,7 @@ screen:
     fps: 60
 
 gravity: 100
-air_resistence: -5
+air_resistence: -2
 meter: 50  # meters to pixels
 
 player:
@@ -20,26 +20,30 @@ player:
     weight: 500
     mass: 75
     pos:
-        x: 450
+        x: 700
         y: 50
     speed:
         walk: 300
         running: 00
     aceleration: 5000
-    jump: 2000
-    friction: 10
+    jump: 2500
+    coefficient of friction:
+        static: 5
+        kinetic: 3
 
 ground:
     layer: 1
     height: 50
-    width: 3000
+    width: 5000
     color: brown
-    friction: 5
+    coefficient of friction:
+        static: 5
+        kinetic: 3
 
 rocks:
     layer: 1
     color: grey
-    density: 10
+    density: 3
     coefficient of friction:
         static: 5
         kinetic: 3
@@ -47,32 +51,44 @@ rocks:
         width: 300
         height: 250
         pos:
-            x: 1000
+            x: 2000
             y: 50
     rock2:
         width: 300
         height: 30
         pos:
-            x: 350
+            x: 1450
             y: 250
     rock3:
         width: 230
         height: 30
         pos:
-            x: 50
+            x: 150
             y: 50
 
 
 boxes:
     layer: 1
     density: 1
+    color: (139,69,19)
     coefficient of friction:
         static: .5
         kinetic: .3
     box1:
-        color: (139,69,19)
         width: 60
         height: 70
         pos:
-            x: 660
+            x: 560
+            y: 50
+    box2:
+        width: 60
+        height: 70
+        pos:
+            x: 460
+            y: 50
+    box3:
+        width: 60
+        height: 70
+        pos:
+            x: 360
             y: 50
