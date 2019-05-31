@@ -11,8 +11,8 @@ def col(color):
 
 def backoff(object1, object2):
     object1, object2 = object2, object1
-    print 'backoff'
-    print object1.id, object2.id
+    print('backoff')
+    print(object1.id, object2.id)
 
     pos = object1.pos
     obj = object2.rect
@@ -30,24 +30,24 @@ def backoff(object1, object2):
         setattr(object1.acc, direction, 0)
 
     def put_on_left():
-        print 'put_on_left'
-        print 12, pos
+        print('put_on_left')
+        print(12, pos)
         pos.x = obj.left - object1.rect.width / 2
-        print 13, pos
+        print(13, pos)
         object1.touch_right = object2
-        print 14, pos
+        print(14, pos)
         reset_vel_and_acc('x')
-        print 15, pos
+        print(15, pos)
 
     def put_on_right():
-        print 'put_on_right'
-        print 16, pos
+        print('put_on_right')
+        print(16, pos)
         pos.x = obj.right + object1.rect.width / 2
-        print 17, pos
+        print(17, pos)
         object1.touch_left = object2
-        print 18, pos
+        print(18, pos)
         reset_vel_and_acc('x')
-        print 19, pos
+        print(19, pos)
 
     def put_on_top():
         pos.y = obj.top

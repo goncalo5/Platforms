@@ -55,12 +55,12 @@ class Game(object):
         # create sprites:
         self.player = Player(self)
         self.ground = Ground(self)
-        self.rock1 = Rock(self, 'rock1')
-        self.rock2 = Rock(self, 'rock2')
-        self.rock3 = Rock(self, 'rock3')
-        self.box1 = Box(self, 'box1')
-        self.box2 = Box(self, 'box2')
-        self.box3 = Box(self, 'box3')
+        # self.rock1 = Rock(self, 'rock1')
+        # self.rock2 = Rock(self, 'rock2')
+        # self.rock3 = Rock(self, 'rock3')
+        # self.box1 = Box(self, 'box1')
+        # self.box2 = Box(self, 'box2')
+        # self.box3 = Box(self, 'box3')
 
     def run(self):
         # game loop - set  self.playing = False to end the game
@@ -145,9 +145,9 @@ class Game(object):
             for obstacle2 in obstacles2:
                 if obstacle1 is obstacle2:
                     continue
-                print
-                print 3, 'self.box1.pos', self.box1.pos
-                print 4, 'self.box2.pos', self.box2.pos
+                print()
+                print(3, 'self.box1.pos', self.box1.pos)
+                print(4, 'self.box2.pos', self.box2.pos)
 
                 obstacle1.hit_direction = sign(self.player.vel.x)
                 backoff(obstacle1, obstacle2)
@@ -161,8 +161,8 @@ class Game(object):
                 # print 2, 'obstacle2.touch_top', obstacle2.touch_top
                 # print 2, 'obstacle2.touch_bot', obstacle2.touch_bot
 
-                print 5, 'self.box1.pos', self.box1.pos
-                print 6, 'self.box2.pos', self.box2.pos
+                print(5, 'self.box1.pos', self.box1.pos)
+                print(6, 'self.box2.pos', self.box2.pos)
             obstacle1.rect.midbottom = obstacle1.pos
 
         # if player reaches 1/4 of screen:

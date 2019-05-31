@@ -85,7 +85,7 @@ class Rock(Obstacle):
                  pos=None, image=None, layer=None):
         self.groups = game.all_sprites, game.obstacles, game.rocks
         super(Rock, self).__init__(game, id=id, group='rocks')
-        print 'self.groups', self.groups
+        print('self.groups', self.groups)
 
 
 class Box(Obstacle):
@@ -93,4 +93,4 @@ class Box(Obstacle):
                  pos=None, image=None, layer=None):
         self.groups = game.all_sprites, game.obstacles, game.boxes
         super(Box, self).__init__(game, id=id, group='boxes')
-        print 'self.groups', self.groups
+        print('self.groups', self.groups)

@@ -22,7 +22,7 @@ class Ground(pg.sprite.Sprite):
 
         self.pos = vec(self.rect.topleft)
 
-        print 12, self.rect
+        print(12, self.rect)
 
     def update(self):
         self.rect.topleft = self.pos
