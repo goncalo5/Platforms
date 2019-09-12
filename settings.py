@@ -1,8 +1,10 @@
 GAME = {
-    "fps": 60
+    "fps": 60,
 }
 
 
 PLAYER = {
-    "speed": 1000
+    "speed": 1000,
+    "jump": 10,
+    "gravity": 5
 }

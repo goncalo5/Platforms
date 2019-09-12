@@ -3,6 +3,7 @@ from kivy.app import App
 from kivy.core.window import Window
 from kivy import properties as kp
 from kivy.clock import Clock
+from kivy.vector import Vector
 # uix:
 from kivy.uix.image import Image
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -25,11 +26,12 @@ class Sprite(Image):
 
 class Player(Sprite):
     speed = kp.NumericProperty(PLAYER.get("speed"))
+    jump = kp.NumericProperty(PLAYER.get("jump"))
+    vel = kp.ObjectProperty(Vector(0, 0))
+    acc = kp.ObjectProperty(Vector(0, 0))
 
-
-class Game(Screen):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         Window.bind(on_key_down=self._on_keyboard_down)
         Window.bind(on_key_up=self._on_keyboard_up)
         self.keys = set()
@@ -55,14 +57,38 @@ class Game(Screen):
 
 
     def update(self, dt):
+
+        # move horizontally:
         if "right" in self.keys:
             sign = 1
         elif "left" in self.keys:
             sign = -1
         else:
             sign = 0
+        self.x += sign * self.speed * dt
 
-        self.player.x += sign * self.player.speed * dt
+        # Jump:
+        if "spacebar" in self.keys:
+            self.vel.y = self.jump
+        self.y += self.vel.y
+
+        # Gravity:
+        self.acc.y = -PLAYER.get("gravity")
+
+        # Kinematic:
+        self.vel += self.acc * dt
+        self.pos = Vector(self.pos) + self.vel * dt + 0.5 * self.acc * dt ** 2
+
+        # colissions:
+        # collision - Ground:
+        if self.y <= 0:
+            self.y = 0
+
+
+
+class Game(Screen):
+    def update(self, dt):
+        self.player.update(dt)
 
 
 class GameApp(App):
