@@ -54,6 +54,7 @@ class Player(Sprite):
         "platform": True,
         "rock": False
     })
+    is_grabbing = kp.BooleanProperty(False)
 
     def __init__(self, **kwargs):
         # print("__init__ player", self.width)
@@ -115,6 +116,8 @@ class Player(Sprite):
             # Gravity:
             # print("apply grav")
             self.acc.y = -self.gravity
+        if self.is_grabbing:
+            self.acc.y = -self.gravity
 
         # Kinematic:
         self.vel += self.acc * dt
@@ -130,6 +133,7 @@ class Game(Screen):
 
         self.player.is_touching["platform"] = False
         self.player.is_touching["rock"] = False
+        self.player.is_grabbing = False
         for sprite in self.children:
             # collision - platforms:
             if isinstance(sprite, Platform):
@@ -145,7 +149,6 @@ class Game(Screen):
             if isinstance(sprite, Rock):
                 if self.player.collide_widget(sprite):
                     # print("collide with a rock")
-                    # self.player.is_touching["rock"] = True
                     dx1 = abs(self.player.right - sprite.x)
                     dx2 = abs(self.player.x - sprite.right)
                     dx = min(dx1, dx2)
@@ -154,31 +157,25 @@ class Game(Screen):
                     dy = min(dy1, dy2)
                     if dx > dy:
                         print("vertical", self.player.vel)
-                        if self.player.vel.y > 0:
+                        if dy1 < dy2:
                             self.player.top = sprite.y
                             self.player.vel.y *= -1
-                        elif self.player.vel.y < 0:
+                        elif dy1 > dy2:
                             self.player.y = sprite.top
                             self.player.vel = Vector(0, 0)
                             self.player.is_touching["rock"] = True
                     else:
                         # print("horizontal", self.player.vel)
-                        if self.player.vel.x > 0:
+                        if dx1 < dx2:
                             self.player.right = sprite.x
                             self.player.vel = Vector(0, 0)
-                            # self.player.is_touching["rock"] = True
-                        elif self.player.vel.x < 0:
+                            self.player.is_touching["rock"] = True
+                            self.player.is_grabbing = True
+                        elif dx1 > dx2:
                             self.player.x = sprite.right
                             self.player.vel = Vector(0, 0)
-                            # self.player.is_touching["rock"] = True
-                    # if self.player.vel.y > 0:
-                    #     self.player.top = sprite.y
-                    # elif self.player.vel.x < 0:
-                    #     self.player.y = sprite.top
-                    # elif self.player.vel.x > 0:
-                    #     self.player.right = sprite.x
-                    # elif self.player.vel.x < 0:
-                    #     self.player.x = sprite.right
+                            self.player.is_touching["rock"] = True
+                            self.player.is_grabbing = True
                 
         print(self.player.is_touching["rock"])
 
