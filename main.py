@@ -10,6 +10,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 # self:
 from settings import GAME, PLAYER
 
+Window.fullscreen = 'auto'
 
 convert_code2key = {
     82: "up",
@@ -21,6 +22,10 @@ convert_code2key = {
 
 
 class Sprite(Image):
+    pass
+
+
+class Platform(Sprite):
     pass
 
 
@@ -58,9 +63,13 @@ class Player(Sprite):
 
 
     def update(self, dt):
+        print("update player", self.pos)
 
-        # move horizontally:
         if self.is_touching:
+            print("is_touching")
+            self.acc = Vector(0, 0)
+            self.vel = Vector(0, 0)
+            # move horizontally:
             if "right" in self.keys:
                 sign = 1
             elif "left" in self.keys:
@@ -72,27 +81,51 @@ class Player(Sprite):
             # Jump:
             if "spacebar" in self.keys:
                 self.vel.y = self.jump
-
-        # Gravity:
-        self.acc.y = -PLAYER.get("gravity")
+                self.is_touching = False
+        else:
+            # Gravity:
+            print("apply grav")
+            self.acc.y = -PLAYER.get("gravity")
 
         # Kinematic:
         self.vel += self.acc * dt
         self.pos = Vector(self.pos) + self.vel * dt + 0.5 * self.acc * dt ** 2
+        print(self.vel)
 
         # colissions:
         # collision - Ground:
-        if self.y <= 0:
-            self.is_touching = True
-            self.y = 0
-        else:
-            self.is_touching = False
+        # if self.y <= 0:
+        #     self.is_touching = True
+        #     self.y = 0
+        # else:
+        #     self.is_touching = False
+
 
 
 
 class Game(Screen):
     def update(self, dt):
         self.player.update(dt)
+
+        # collision - platforms:
+        # is_touching_in_any_platform = False
+        for sprite in self.children:
+            if not isinstance(sprite, Platform):
+                continue
+            # print(sprite, self.player, sprite == self.player)
+            if self.player.collide_widget(sprite):
+                # print("collide")
+                # is_touching_in_any_platform = True
+                if self.player.center_y < sprite.top:
+                    continue
+                if self.player.vel.y <= 0:
+                    self.player.y = sprite.top
+                    self.player.is_touching = True
+                    break
+        else:
+            self.player.is_touching = False
+
+        # self.player.is_touching = is_touching_in_any_platform
 
 
 class GameApp(App):

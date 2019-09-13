@@ -1,10 +1,58 @@
-
+#:import settings settings
 
 <Sprite>:
     size_hint: None, None
     size: app.tilesize, app.tilesize
+    tile: 0, 0
+    x: app.tilesize * self.tile[0]
+    y: app.tilesize * self.tile[1]
+
+<Platform>:
+    color: settings.COLORS.get("brown")
 
 <Game>:
     player: player
     Player:
         id: player
+        tile: 1, 1
+    # Ground:
+    Platform:
+        tile: 0, 0
+    Platform:
+        tile: 1, 0
+    Platform:
+        tile: 2, 0
+    Platform:
+        tile: 3, 0
+    Platform:
+        tile: 4, 0
+    Platform:
+        tile: 5, 0
+    Platform:
+        tile: 6, 0
+    Platform:
+        tile: 7, 0
+    Platform:
+        tile: 8, 0
+    Platform:
+        tile: 9, 0
+    Platform:
+        tile: 10, 0
+    Platform:
+        tile: 11, 0
+    Platform:
+        tile: 12, 0
+    Platform:
+        tile: 13, 0
+    Platform:
+        tile: 3, 4
+    Platform:
+        tile: 4, 4
+    Platform:
+        tile: 6, 5
+    Platform:
+        tile: 7, 5
+    Platform:
+        tile: 3, 10
+    Platform:
+        tile: 4, 10
