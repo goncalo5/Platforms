@@ -1,3 +1,9 @@
+
+from kivy.config import Config
+# Config.set('graphics', 'resizable', '0')
+Config.set('graphics', 'width', '640')
+Config.set('graphics', 'height', '480')
+
 # kivy:
 from kivy.app import App
 from kivy.core.window import Window
@@ -10,7 +16,8 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 # self:
 from settings import GAME, PLAYER
 
-Window.fullscreen = 'auto'
+# Window.fullscreen = 'auto'
+
 
 convert_code2key = {
     82: "up",
@@ -26,6 +33,10 @@ class Sprite(Image):
 
 
 class Platform(Sprite):
+    pass
+
+
+class Rock(Sprite):
     pass
 
 
@@ -108,24 +119,20 @@ class Game(Screen):
         self.player.update(dt)
 
         # collision - platforms:
-        # is_touching_in_any_platform = False
+        is_touching_in_any_platform = False
         for sprite in self.children:
-            if not isinstance(sprite, Platform):
-                continue
-            # print(sprite, self.player, sprite == self.player)
-            if self.player.collide_widget(sprite):
-                # print("collide")
-                # is_touching_in_any_platform = True
-                if self.player.center_y < sprite.top:
-                    continue
-                if self.player.vel.y <= 0:
-                    self.player.y = sprite.top
-                    self.player.is_touching = True
-                    break
-        else:
-            self.player.is_touching = False
+            if isinstance(sprite, Platform):
+                # print(sprite, self.player, sprite == self.player)
+                if self.player.collide_widget(sprite):
+                    # print("collide")
+                    if self.player.center_y < sprite.top:
+                        continue
+                    if self.player.vel.y <= 0:
+                        self.player.y = sprite.top
+                        self.player.is_touching = True
+                        is_touching_in_any_platform = True
 
-        # self.player.is_touching = is_touching_in_any_platform
+        self.player.is_touching = is_touching_in_any_platform
 
 
 class GameApp(App):
