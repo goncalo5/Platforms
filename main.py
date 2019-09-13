@@ -41,8 +41,12 @@ class Rock(Sprite):
 
 
 class Player(Sprite):
+    # constants:
     speed = kp.NumericProperty(PLAYER.get("speed"))
     jump = kp.NumericProperty(PLAYER.get("jump"))
+    gravity = kp.NumericProperty(PLAYER.get("gravity"))
+
+    # vars:
     vel = kp.ObjectProperty(Vector(0, 0))
     acc = kp.ObjectProperty(Vector(0, 0))
     is_touching = kp.BooleanProperty(True)
@@ -74,10 +78,10 @@ class Player(Sprite):
 
 
     def update(self, dt):
-        print("update player", self.pos)
+        # print("update player", self.pos)
 
         if self.is_touching:
-            print("is_touching")
+            # print("is_touching")
             self.acc = Vector(0, 0)
             self.vel = Vector(0, 0)
             # move horizontally:
@@ -91,17 +95,18 @@ class Player(Sprite):
 
             # Jump:
             if "spacebar" in self.keys:
-                self.vel.y = self.jump
+                y = self.jump * self.width
+                self.vel.y = (2 * self.gravity * y) ** 0.5
                 self.is_touching = False
         else:
             # Gravity:
-            print("apply grav")
-            self.acc.y = -PLAYER.get("gravity")
+            # print("apply grav")
+            self.acc.y = -self.gravity
 
         # Kinematic:
         self.vel += self.acc * dt
         self.pos = Vector(self.pos) + self.vel * dt + 0.5 * self.acc * dt ** 2
-        print(self.vel)
+        # print(self.vel)
 
         # colissions:
         # collision - Ground:
