@@ -50,7 +50,10 @@ class Player(Sprite):
     # vars:
     vel = kp.ObjectProperty(Vector(0, 0))
     acc = kp.ObjectProperty(Vector(0, 0))
-    is_touching = kp.BooleanProperty(True)
+    is_touching = kp.DictProperty({
+        "platform": True,
+        "rock": False
+    })
 
     def __init__(self, **kwargs):
         # print("__init__ player", self.width)
@@ -90,8 +93,7 @@ class Player(Sprite):
     def update(self, dt):
         # print("update player", self.pos)
 
-        if self.is_touching:
-            # print("is_touching")
+        if self.is_touching["platform"] or self.is_touching["rock"]:
             self.acc = Vector(0, 0)
             self.vel = Vector(0, 0)
             # move horizontally:
@@ -102,14 +104,13 @@ class Player(Sprite):
             else:
                 sign = 0
             self.vel.x = sign * self.speed
-            print(55, self.vel.x, self.keys, dt)
-
+            # print("vel", self.vel)
 
             # Jump:
             if "spacebar" in self.keys:
                 y = self.jump * self.width
                 self.vel.y = (2 * self.gravity * y) ** 0.5
-                self.is_touching = False
+                self.is_touching["platform"] = False
         else:
             # Gravity:
             # print("apply grav")
@@ -118,16 +119,19 @@ class Player(Sprite):
         # Kinematic:
         self.vel += self.acc * dt
         self.pos = Vector(self.pos) + self.vel * dt + 0.5 * self.acc * dt ** 2
-        print(57, self.vel.x, self.keys)
 
 
 class Game(Screen):
+    fps = kp.NumericProperty()
+
     def update(self, dt):
+        self.fps = 1 / dt if abs(1 / dt - self.fps) > 5 else self.fps
         self.player.update(dt)
 
-        # collision - platforms:
-        is_touching_in_any_platform = False
+        self.player.is_touching["platform"] = False
+        self.player.is_touching["rock"] = False
         for sprite in self.children:
+            # collision - platforms:
             if isinstance(sprite, Platform):
                 # print(sprite, self.player, sprite == self.player)
                 if self.player.collide_widget(sprite):
@@ -136,14 +140,55 @@ class Game(Screen):
                         continue
                     if self.player.vel.y <= 0:
                         self.player.y = sprite.top
-                        self.player.is_touching = True
-                        is_touching_in_any_platform = True
+                        self.player.is_touching["platform"] = True
+            # collision - rocks:
+            if isinstance(sprite, Rock):
+                if self.player.collide_widget(sprite):
+                    # print("collide with a rock")
+                    # self.player.is_touching["rock"] = True
+                    dx1 = abs(self.player.right - sprite.x)
+                    dx2 = abs(self.player.x - sprite.right)
+                    dx = min(dx1, dx2)
+                    dy1 = abs(self.player.top - sprite.y)
+                    dy2 = abs(self.player.y - sprite.top)
+                    dy = min(dy1, dy2)
+                    if dx > dy:
+                        print("vertical", self.player.vel)
+                        if self.player.vel.y > 0:
+                            self.player.top = sprite.y
+                            self.player.vel.y *= -1
+                        elif self.player.vel.y < 0:
+                            self.player.y = sprite.top
+                            self.player.vel = Vector(0, 0)
+                            self.player.is_touching["rock"] = True
+                    else:
+                        # print("horizontal", self.player.vel)
+                        if self.player.vel.x > 0:
+                            self.player.right = sprite.x
+                            self.player.vel = Vector(0, 0)
+                            # self.player.is_touching["rock"] = True
+                        elif self.player.vel.x < 0:
+                            self.player.x = sprite.right
+                            self.player.vel = Vector(0, 0)
+                            # self.player.is_touching["rock"] = True
+                    # if self.player.vel.y > 0:
+                    #     self.player.top = sprite.y
+                    # elif self.player.vel.x < 0:
+                    #     self.player.y = sprite.top
+                    # elif self.player.vel.x > 0:
+                    #     self.player.right = sprite.x
+                    # elif self.player.vel.x < 0:
+                    #     self.player.x = sprite.right
+                
+        print(self.player.is_touching["rock"])
 
-        self.player.is_touching = is_touching_in_any_platform
 
 
 class GameApp(App):
+    width = kp.NumericProperty(Window.width)
+    height = kp.NumericProperty(Window.height)
     tilesize = kp.NumericProperty(Window.height * GAME.get("tilesize", 1 / 12))
+    
     def build(self):
         self.game = Game()
         Clock.schedule_interval(self.game.update, 1 / GAME.get("fps", 60))
