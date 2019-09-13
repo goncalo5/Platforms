@@ -29,6 +29,7 @@ class Player(Sprite):
     jump = kp.NumericProperty(PLAYER.get("jump"))
     vel = kp.ObjectProperty(Vector(0, 0))
     acc = kp.ObjectProperty(Vector(0, 0))
+    is_touching = kp.BooleanProperty(True)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -59,18 +60,18 @@ class Player(Sprite):
     def update(self, dt):
 
         # move horizontally:
-        if "right" in self.keys:
-            sign = 1
-        elif "left" in self.keys:
-            sign = -1
-        else:
-            sign = 0
-        self.x += sign * self.speed * dt
+        if self.is_touching:
+            if "right" in self.keys:
+                sign = 1
+            elif "left" in self.keys:
+                sign = -1
+            else:
+                sign = 0
+            self.vel.x = sign * self.speed * dt
 
-        # Jump:
-        if "spacebar" in self.keys:
-            self.vel.y = self.jump
-        self.y += self.vel.y
+            # Jump:
+            if "spacebar" in self.keys:
+                self.vel.y = self.jump
 
         # Gravity:
         self.acc.y = -PLAYER.get("gravity")
@@ -82,7 +83,10 @@ class Player(Sprite):
         # colissions:
         # collision - Ground:
         if self.y <= 0:
+            self.is_touching = True
             self.y = 0
+        else:
+            self.is_touching = False
 
 
 
