@@ -5,11 +5,12 @@ COLORS = {
 
 GAME = {
     "fps": 60,
+    "tilesize": 1 / 12
 }
 
 
 PLAYER = {
-    "speed": 20000,
+    "speed": 3,
     "jump": 4.2,
     "gravity": 2500
 }
