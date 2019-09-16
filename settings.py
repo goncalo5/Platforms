@@ -13,7 +13,7 @@ GAME = {
 
 
 PLAYER = {
-    "speed": 4,
+    "speed": 10,
     "jump": 4.2,
     "gravity": 2500
 }

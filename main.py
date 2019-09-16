@@ -141,6 +141,9 @@ class Player(Sprite):
 
 class Game(Screen):
     fps = kp.NumericProperty()
+    paused = kp.BooleanProperty(False)
+    game_over_msg = kp.StringProperty()
+    win = kp.BooleanProperty(False)
     gold = kp.NumericProperty()
 
     def __init__(self, **kwargs):
@@ -173,6 +176,8 @@ class Game(Screen):
                     self.add_widget(tile)
 
     def update(self, dt):
+        if self.paused:
+            return
         self.fps = 1 / dt if abs(1 / dt - self.fps) > 5 else self.fps
         self.player.update(dt)
 
@@ -233,8 +238,9 @@ class Game(Screen):
             if isinstance(sprite, Flag):
                 if self.player.collide_widget(sprite):
                     print("WIN")
+                    self.win = True
+                    self.over()
 
-                
         # scroll:
         scroll = 0
         min_scroll = 100
@@ -247,6 +253,13 @@ class Game(Screen):
             if not isinstance(sprite, Sprite):
                 continue
             sprite.x -= scroll
+
+    def over(self):
+        self.paused = True
+        if self.win:
+            self.game_over_msg = "YOU WIN"
+        else:
+            self.game_over_msg = "GAME OVER"
 
 
 class MetaGame(ScreenManager):

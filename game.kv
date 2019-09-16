@@ -30,6 +30,11 @@
         size_hint: None, None
         x: app.width * 3 / 4
         top: app.height
+    Label:
+        text: "%s" % root.game_over_msg
+        size_hint: None, None
+        center_x: app.width * 0.5
+        y: app.height * 0.5
 
 <StoreScreen@Screen>
 
@@ -37,7 +42,6 @@
     Button:
         text: "Play"
         on_press:
-            # root.manager.current = "game_screen"
             root.manager.new_game()
 
 <MetaGame>:
