@@ -72,16 +72,17 @@ class Player(Sprite):
     is_grabbing = kp.BooleanProperty(False)
 
     def __init__(self, **kwargs):
-        # print("__init__ player", self.width)
+        print("__init__ player", self)
         super().__init__(**kwargs)
         # print(self.width)
         Window.bind(on_key_down=self._on_keyboard_down)
         Window.bind(on_key_up=self._on_keyboard_up)
         self.keys = set()
         Clock.schedule_once(self.after_init, 0)
+        print(55)
 
     def after_init(self, dt):
-        # print(self.width)
+        print("after_init")
         self.app = App.get_running_app()
         self.tilesize = self.app.tilesize
         self.speed = PLAYER.get("speed") * self.tilesize
@@ -108,6 +109,11 @@ class Player(Sprite):
 
     def update(self, dt):
         # print("update player", self.pos)
+
+        try:
+            self.speed
+        except AttributeError:
+            self.after_init(0)
 
         if self.is_touching["platform"] or self.is_touching["rock"]:
             self.acc = Vector(0, 0)
@@ -149,10 +155,13 @@ class Game(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def new(self):
+    def new(self, map_name):
+        self.paused = False
+        self.win = 0
+        self.clean_all_sprites()
         # load data:
         self.data = []
-        with open(GAME.get("first_map"), "rt") as f:
+        with open(map_name, "rt") as f:
             for line in f:
                 self.data.append(line.strip())
         print(self.data)
@@ -261,16 +270,29 @@ class Game(Screen):
         else:
             self.game_over_msg = "GAME OVER"
 
+    def clean_all_sprites(self):
+        print("clean_all_sprites")
+        for sprite in self.children.copy():
+            if not isinstance(sprite, Sprite):
+                continue
+            self.remove_widget(sprite)
+        self.player = None
 
 class MetaGame(ScreenManager):
-    pass
+    maps = kp.ListProperty(GAME.get("maps"))
+    level = kp.NumericProperty(1)
     # def __init__(self, **kwargs):
     #     super().__init__()
 
     def new_game(self):
         self.current = "game_screen"
-        self.game.new()
+        self.game.new(self.maps[0])
         Clock.schedule_interval(self.game.update, 1 / GAME.get("fps", 60))
+
+    def next_level(self):
+        self.level += 1
+        map_name = self.maps[self.level - 1]
+        self.game.new(map_name)
 
 
 

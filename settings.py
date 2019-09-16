@@ -8,7 +8,10 @@ COLORS = {
 GAME = {
     "fps": 60,
     "tilesize": 1 / 12,
-    "first_map": "Levels/level1.txt"
+    "maps": [
+        "Levels/level1.txt",
+        "Levels/level2.txt",
+    ]
 }
 
 

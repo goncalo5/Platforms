@@ -23,7 +23,7 @@
     Label:
         text: "fps: %s" % int(root.fps)
         size_hint: None, None
-        x: app.width / 2
+        x: app.width * 0.2
         top: app.height
     Label:
         text: "gold: %s" % int(root.gold)
@@ -35,6 +35,11 @@
         size_hint: None, None
         center_x: app.width * 0.5
         y: app.height * 0.5
+    Label:
+        text: "level: %s" % root.manager.level
+        size_hint: None, None
+        center_x: app.width * 0.5
+        top: app.height
     Button:
         text: "next level"
         size_hint: None, None
@@ -43,6 +48,8 @@
         y: app.height * 0.4
         disabled: not root.win
         opacity: root.win
+        on_press:
+            root.manager.next_level()
 
 <StoreScreen@Screen>
 
