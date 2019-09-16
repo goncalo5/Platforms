@@ -36,6 +36,11 @@ class Sprite(Image):
         super().__init__()
         self.tile = kwargs.get("tile")
 
+    def on_tile(self, *args):
+        print("on_tile")
+        self.x = self.tilesize * self.tile[0]
+        self.y = self.tilesize * self.tile[1]
+
 
 class Platform(Sprite):
     def __init__(self, **kwargs):
@@ -75,7 +80,7 @@ class Player(Sprite):
     def __init__(self, **kwargs):
         print("__init__ player", self)
         super().__init__(**kwargs)
-        # print(self.width)
+        print(self.pos, self.size)
         Window.bind(on_key_down=self._on_keyboard_down)
         Window.bind(on_key_up=self._on_keyboard_up)
         self.keys = set()
@@ -108,12 +113,7 @@ class Player(Sprite):
 
 
     def update(self, dt):
-        # print("update player", self.pos)
-
-        try:
-            self.speed
-        except AttributeError:
-            self.after_init(0)
+        print("update player", self.pos, self.size)
 
         if self.is_touching["platform"] or self.is_touching["rock"]:
             self.acc = Vector(0, 0)
@@ -154,6 +154,8 @@ class Game(Screen):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.player = Player(tile=(0, 0))
+        self.add_widget(self.player)
 
     def new(self, map_name):
         self.paused = False
@@ -164,13 +166,14 @@ class Game(Screen):
         with open(map_name, "rt") as f:
             for line in f:
                 self.data.append(line.strip())
-        print(self.data)
+        print("map", self.data)
         for row, tiles in enumerate(reversed(self.data)):
             for col, tile in enumerate(tiles):
                 if tile == "1":
-                    tile = Player(tile=(col, row))
-                    self.player = tile
-                    self.add_widget(tile)
+                    print("player reposition", self.player.pos)
+                    self.player.tile = (col, row)
+                    self.player.on_tile()
+                    print(self.player.pos)
                 elif tile == "P":
                     tile = Platform(tile=(col, row))
                     self.add_widget(tile)
@@ -273,7 +276,7 @@ class Game(Screen):
     def clean_all_sprites(self):
         print("clean_all_sprites")
         for sprite in self.children.copy():
-            if not isinstance(sprite, Sprite):
+            if not isinstance(sprite, Sprite) or sprite == self.player:
                 continue
             self.remove_widget(sprite)
         self.game_over_msg = ""
