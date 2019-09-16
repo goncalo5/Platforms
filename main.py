@@ -94,6 +94,8 @@ class Player(Sprite):
 
     def _on_keyboard_down(self, *args):
         # print("_on_keyboard_down", args)
+        if self.parent.manager.current == "main_menu":
+            self.parent.manager.new_game()
         code = args[2]
         key = convert_code2key.get(code)
         # print(key)
@@ -113,7 +115,7 @@ class Player(Sprite):
 
 
     def update(self, dt):
-        print("update player", self.pos, self.size)
+        # print("update player", self.pos, self.size)
 
         if self.is_touching["platform"] or self.is_touching["rock"]:
             self.acc = Vector(0, 0)

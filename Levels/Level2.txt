@@ -1,12 +1,12 @@
-RRRRRR                                  RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
-R                                                                    R
-R                                                                    R
-R                                                                    R
-R                                                                    R
-R                                                                    R
-R        C                                                           R
-R              RR  RR  RR       RRRR                                 R
-R       RRR                                                          R
-R                                                                    R
-R   1   C                                                         F  R
-PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+RRRRRR                                                             RRRRRR
+R                                                                       R
+R                                                                       R
+R                                                                       R
+R                                                                       R
+R                                           C                           R
+R           C             C           C           C                     R
+R                         RR       RRRR                                 R
+R          RRRRR                                                        R
+R                                                                       R
+R   1                                                                F  R
+PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
