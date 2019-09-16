@@ -158,6 +158,7 @@ class Game(Screen):
         self.fps = 1 / dt if abs(1 / dt - self.fps) > 5 else self.fps
         self.player.update(dt)
 
+        # collisions:
         self.player.is_touching["platform"] = False
         self.player.is_touching["rock"] = False
         self.player.is_grabbing = False
@@ -204,7 +205,18 @@ class Game(Screen):
                             self.player.is_touching["rock"] = True
                             self.player.is_grabbing = True
                 
-        # print(self.player.is_touching["rock"])
+        # scroll:
+        scroll = 0
+        if self.player.x > Window.width * 3 / 4:
+            print("scroll", self.player.x, self.player.vel.x, Window.width)
+            scroll = max(abs(self.player.vel.x), 2) * dt
+        elif self.player.x < Window.width * 1 / 4:
+            scroll =  - max(abs(self.player.vel.x), 2) * dt
+        print(scroll)
+        for sprite in self.children:
+            if not isinstance(sprite, Sprite):
+                continue
+            sprite.x -= scroll
 
 
 
