@@ -294,8 +294,12 @@ class MetaGame(ScreenManager):
 
     def next_level(self):
         self.level += 1
-        map_name = self.maps[self.level - 1]
-        self.game.new(map_name)
+        if len(self.maps) >= self.level:
+            map_name = self.maps[self.level - 1]
+            self.game.new(map_name)
+        else:
+            self.game.game_over_msg = "YOU END THE GAME!!!"
+            self.game.win = 0
 
 
 
