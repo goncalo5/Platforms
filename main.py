@@ -51,6 +51,11 @@ class Coin(Sprite):
         super().__init__(**kwargs)
 
 
+class Flag(Sprite):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
 class Player(Sprite):
     # constants:
     # speed = kp.NumericProperty(PLAYER.get("speed"))
@@ -162,6 +167,9 @@ class Game(Screen):
                 elif tile == "C":
                     tile = Coin(tile=(col, row))
                     self.add_widget(tile)
+                elif tile == "F":
+                    tile = Flag(tile=(col, row))
+                    self.add_widget(tile)
 
     def update(self, dt):
         self.fps = 1 / dt if abs(1 / dt - self.fps) > 5 else self.fps
@@ -220,6 +228,10 @@ class Game(Screen):
                     self.gold += 1
                     self.remove_widget(sprite)
                     print("coin", self.gold)
+            # collision - flag:
+            if isinstance(sprite, Flag):
+                if self.player.collide_widget(sprite):
+                    print("WIN")
 
                 
         # scroll:
