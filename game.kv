@@ -14,77 +14,8 @@
     color: settings.COLORS.get("darkbrown")
 
 <Game>:
-    player: player
     Label:
         text: "fps: %s" % int(root.fps)
         size_hint: None, None
         x: app.width / 2
         top: app.height
-    Player:
-        id: player
-        tile: 1, 1
-    # Ground:
-    Platform:
-        tile: 0, 0
-    Platform:
-        tile: 1, 0
-    Platform:
-        tile: 2, 0
-    Platform:
-        tile: 3, 0
-    Platform:
-        tile: 4, 0
-    Platform:
-        tile: 5, 0
-    Platform:
-        tile: 6, 0
-    Platform:
-        tile: 7, 0
-    Platform:
-        tile: 8, 0
-    Platform:
-        tile: 9, 0
-    Platform:
-        tile: 10, 0
-    Platform:
-        tile: 11, 0
-    Platform:
-        tile: 12, 0
-    Platform:
-        tile: 13, 0
-    # init wall:
-    Rock:
-        tile: 0, 1
-    Rock:
-        tile: 0, 2
-    Rock:
-        tile: 0, 3
-    Rock:
-        tile: 0, 4
-    Rock:
-        tile: 0, 5
-    Rock:
-        tile: 0, 6
-    Rock:
-        tile: 0, 7
-    Rock:
-        tile: 0, 8
-    Rock:
-        tile: 0, 9
-    Rock:
-        tile: 0, 10
-    # other platforms:
-    Rock:
-        tile: 5, 4
-    # Platform:
-    #     tile: 3, 4
-    # Platform:
-    #     tile: 4, 4
-    # Platform:
-    #     tile: 6, 5
-    # Platform:
-    #     tile: 7, 5
-    # Platform:
-    #     tile: 3, 10
-    # Platform:
-    #     tile: 4, 10

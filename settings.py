@@ -5,7 +5,8 @@ COLORS = {
 
 GAME = {
     "fps": 60,
-    "tilesize": 1 / 12
+    "tilesize": 1 / 12,
+    "first_map": "map1.txt"
 }
 
 

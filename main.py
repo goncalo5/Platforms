@@ -30,15 +30,20 @@ convert_code2key = {
 
 
 class Sprite(Image):
-    pass
+    tile = kp.ListProperty([0, 0])
+    def __init__(self, **kwargs):
+        super().__init__()
+        self.tile = kwargs.get("tile")
 
 
 class Platform(Sprite):
-    pass
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class Rock(Sprite):
-    pass
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class Player(Sprite):
@@ -127,6 +132,28 @@ class Player(Sprite):
 class Game(Screen):
     fps = kp.NumericProperty()
 
+    def __init__(self):
+        super().__init__()
+
+        # load data:
+        self.data = []
+        with open(GAME.get("first_map"), "rt") as f:
+            for line in f:
+                self.data.append(line.strip())
+        print(self.data)
+        for row, tiles in enumerate(reversed(self.data)):
+            for col, tile in enumerate(tiles):
+                if tile == "1":
+                    tile = Player(tile=(col, row))
+                    self.player = tile
+                    self.add_widget(tile)
+                elif tile == "P":
+                    tile = Platform(tile=(col, row))
+                    self.add_widget(tile)
+                elif tile == "R":
+                    tile = Rock(tile=(col, row))
+                    self.add_widget(tile)
+
     def update(self, dt):
         self.fps = 1 / dt if abs(1 / dt - self.fps) > 5 else self.fps
         self.player.update(dt)
@@ -156,7 +183,7 @@ class Game(Screen):
                     dy2 = abs(self.player.y - sprite.top)
                     dy = min(dy1, dy2)
                     if dx > dy:
-                        print("vertical", self.player.vel)
+                        # print("vertical", self.player.vel)
                         if dy1 < dy2:
                             self.player.top = sprite.y
                             self.player.vel.y *= -1
@@ -177,7 +204,7 @@ class Game(Screen):
                             self.player.is_touching["rock"] = True
                             self.player.is_grabbing = True
                 
-        print(self.player.is_touching["rock"])
+        # print(self.player.is_touching["rock"])
 
 
 
