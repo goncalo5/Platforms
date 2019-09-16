@@ -195,7 +195,7 @@ class Game(Screen):
                     if dx > dy:
                         # print("vertical", self.player.vel)
                         if dy1 < dy2:
-                            self.player.top = sprite.y
+                            self.player.top = sprite.y - 1
                             self.player.vel.y *= -1
                         elif dy1 > dy2:
                             self.player.y = sprite.top
@@ -224,10 +224,12 @@ class Game(Screen):
                 
         # scroll:
         scroll = 0
+        min_scroll = 100
         if self.player.x > Window.width * 3 / 4:
-            scroll = max(abs(self.player.vel.x), 2) * dt
+            scroll = max(abs(self.player.vel.x), min_scroll) * dt
         elif self.player.x < Window.width * 1 / 4:
-            scroll =  - max(abs(self.player.vel.x), 2) * dt
+            scroll =  - max(abs(self.player.vel.x), min_scroll) * dt
+        # print(scroll)
         for sprite in self.children:
             if not isinstance(sprite, Sprite):
                 continue
