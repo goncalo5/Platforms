@@ -30,6 +30,7 @@ convert_code2key = {
 
 
 class Sprite(Image):
+    tilesize = kp.NumericProperty(Window.height * GAME.get("tilesize", 1 / 12))
     tile = kp.ListProperty([0, 0])
     def __init__(self, **kwargs):
         super().__init__()
@@ -84,7 +85,6 @@ class Player(Sprite):
     def after_init(self, dt):
         print("after_init")
         self.app = App.get_running_app()
-        self.tilesize = self.app.tilesize
         self.speed = PLAYER.get("speed") * self.tilesize
 
     def _on_keyboard_down(self, *args):
@@ -276,7 +276,7 @@ class Game(Screen):
             if not isinstance(sprite, Sprite):
                 continue
             self.remove_widget(sprite)
-        self.player = None
+        self.game_over_msg = ""
 
 class MetaGame(ScreenManager):
     maps = kp.ListProperty(GAME.get("maps"))
@@ -299,7 +299,6 @@ class MetaGame(ScreenManager):
 class GameApp(App):
     width = kp.NumericProperty(Window.width)
     height = kp.NumericProperty(Window.height)
-    tilesize = kp.NumericProperty(Window.height * GAME.get("tilesize", 1 / 12))
     
     def build(self):
         self.meta_game = MetaGame()

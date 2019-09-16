@@ -2,10 +2,10 @@
 
 <Sprite>:
     size_hint: None, None
-    size: app.tilesize, app.tilesize
+    size: self.tilesize, self.tilesize
     tile: 0, 0
-    x: app.tilesize * self.tile[0]
-    y: app.tilesize * self.tile[1]
+    x: self.tilesize * self.tile[0]
+    y: self.tilesize * self.tile[1]
 
 <Platform>:
     color: settings.COLORS.get("brown")
