@@ -1,12 +1,12 @@
-RRRRRR
-R
-R
-R
-R
-R
-R
-R   RR  RR  RR  RR  RR
-R
-R
-R   1
-PPPPPPPPPPPPPPPPPPPPPPPPPP
+RRRRRR                                  RRRRR
+R                                           R
+R                                           R
+R                                           R
+R                                           R
+R                                           R
+R        C                                  R
+R              RR  RR  RR       RRRR        R
+R       RRR                                 R
+R                                           R
+R   1                                       R
+PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP

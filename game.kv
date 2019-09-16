@@ -13,9 +13,17 @@
 <Rock>:
     color: settings.COLORS.get("darkbrown")
 
+<Coin>:
+    color: settings.COLORS.get("yellow")
+
 <Game>:
     Label:
         text: "fps: %s" % int(root.fps)
         size_hint: None, None
         x: app.width / 2
+        top: app.height
+    Label:
+        text: "gold: %s" % int(root.gold)
+        size_hint: None, None
+        x: app.width * 3 / 4
         top: app.height

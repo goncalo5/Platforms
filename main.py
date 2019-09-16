@@ -46,6 +46,11 @@ class Rock(Sprite):
         super().__init__(**kwargs)
 
 
+class Coin(Sprite):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
 class Player(Sprite):
     # constants:
     # speed = kp.NumericProperty(PLAYER.get("speed"))
@@ -131,6 +136,7 @@ class Player(Sprite):
 
 class Game(Screen):
     fps = kp.NumericProperty()
+    gold = kp.NumericProperty()
 
     def __init__(self):
         super().__init__()
@@ -152,6 +158,9 @@ class Game(Screen):
                     self.add_widget(tile)
                 elif tile == "R":
                     tile = Rock(tile=(col, row))
+                    self.add_widget(tile)
+                elif tile == "C":
+                    tile = Coin(tile=(col, row))
                     self.add_widget(tile)
 
     def update(self, dt):
@@ -204,15 +213,21 @@ class Game(Screen):
                             self.player.vel = Vector(0, 0)
                             self.player.is_touching["rock"] = True
                             self.player.is_grabbing = True
+            # collision - coins:
+            if isinstance(sprite, Coin):
+                if self.player.collide_widget(sprite):
+                    print("coin", self.gold)
+                    self.gold += 1
+                    self.remove_widget(sprite)
+                    print("coin", self.gold)
+
                 
         # scroll:
         scroll = 0
         if self.player.x > Window.width * 3 / 4:
-            print("scroll", self.player.x, self.player.vel.x, Window.width)
             scroll = max(abs(self.player.vel.x), 2) * dt
         elif self.player.x < Window.width * 1 / 4:
             scroll =  - max(abs(self.player.vel.x), 2) * dt
-        print(scroll)
         for sprite in self.children:
             if not isinstance(sprite, Sprite):
                 continue
