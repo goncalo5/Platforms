@@ -35,6 +35,14 @@
         size_hint: None, None
         center_x: app.width * 0.5
         y: app.height * 0.5
+    Button:
+        text: "next level"
+        size_hint: None, None
+        size: self.texture_size
+        center_x: app.width * 0.5
+        y: app.height * 0.4
+        disabled: not root.win
+        opacity: root.win
 
 <StoreScreen@Screen>
 

@@ -143,7 +143,7 @@ class Game(Screen):
     fps = kp.NumericProperty()
     paused = kp.BooleanProperty(False)
     game_over_msg = kp.StringProperty()
-    win = kp.BooleanProperty(False)
+    win = kp.BooleanProperty(0)
     gold = kp.NumericProperty()
 
     def __init__(self, **kwargs):
@@ -238,7 +238,7 @@ class Game(Screen):
             if isinstance(sprite, Flag):
                 if self.player.collide_widget(sprite):
                     print("WIN")
-                    self.win = True
+                    self.win = 1
                     self.over()
 
         # scroll:
