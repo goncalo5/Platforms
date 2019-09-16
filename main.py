@@ -143,9 +143,10 @@ class Game(Screen):
     fps = kp.NumericProperty()
     gold = kp.NumericProperty()
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
+    def new(self):
         # load data:
         self.data = []
         with open(GAME.get("first_map"), "rt") as f:
@@ -248,6 +249,17 @@ class Game(Screen):
             sprite.x -= scroll
 
 
+class MetaGame(ScreenManager):
+    pass
+    # def __init__(self, **kwargs):
+    #     super().__init__()
+
+    def new_game(self):
+        self.current = "game_screen"
+        self.game.new()
+        Clock.schedule_interval(self.game.update, 1 / GAME.get("fps", 60))
+
+
 
 class GameApp(App):
     width = kp.NumericProperty(Window.width)
@@ -255,9 +267,8 @@ class GameApp(App):
     tilesize = kp.NumericProperty(Window.height * GAME.get("tilesize", 1 / 12))
     
     def build(self):
-        self.game = Game()
-        Clock.schedule_interval(self.game.update, 1 / GAME.get("fps", 60))
-        return self.game
+        self.meta_game = MetaGame()
+        return self.meta_game
 
 if __name__ == "__main__":
     GameApp().run()

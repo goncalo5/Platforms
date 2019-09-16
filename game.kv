@@ -30,3 +30,28 @@
         size_hint: None, None
         x: app.width * 3 / 4
         top: app.height
+
+<StoreScreen@Screen>
+
+<MainMenu@Screen>:
+    Button:
+        text: "Play"
+        on_press:
+            # root.manager.current = "game_screen"
+            root.manager.new_game()
+
+<MetaGame>:
+    id: meta_game
+    game: game_screen
+    MainMenu:
+        id: main_menu
+        name: "main_menu"
+        manager: meta_game
+    Game:
+        id: game_screen
+        name: "game_screen"
+        manager: meta_game
+    StoreScreen:
+        id: store_screen
+        name: "store_screen"
+        manager: meta_game
