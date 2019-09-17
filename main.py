@@ -80,6 +80,8 @@ class Player(Sprite):
     def __init__(self, **kwargs):
         print("__init__ player", self)
         super().__init__(**kwargs)
+        self.source = "atlas://Imgs/Player/player/p1_front"
+        self.allow_stretch = True
         print(self.pos, self.size)
         Window.bind(on_key_down=self._on_keyboard_down)
         Window.bind(on_key_up=self._on_keyboard_up)
@@ -144,7 +146,7 @@ class Player(Sprite):
                 self.is_touching["platform"] = False
         else:
             # Gravity:
-            print("apply grav")
+            # print("apply grav")
             self.acc.y = -self.gravity
         if self.is_grabbing:
             self.acc.y = -self.gravity
@@ -267,7 +269,7 @@ class Game(Screen):
 
         # scroll:
         scroll = 0
-        min_scroll = 200
+        min_scroll = 500
         if self.player.x > Window.width * 0.5:
             scroll = max(abs(self.player.vel.x), min_scroll) * dt
         elif self.player.x < Window.width * 0.3:
