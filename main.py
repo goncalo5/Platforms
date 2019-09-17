@@ -122,7 +122,7 @@ class Player(Sprite):
 
 
     def update(self, dt):
-        print("update player", self.pos, self.size, self.acc)
+        # print("update player", self.pos, self.size, self.acc)
 
         if self.is_touching["platform"] or self.is_touching["rock"]:
             self.acc = Vector(0, 0)
@@ -146,15 +146,12 @@ class Player(Sprite):
             # Gravity:
             print("apply grav")
             self.acc.y = -self.gravity
-        print("2update player", self.pos, self.size, self.acc)
         if self.is_grabbing:
             self.acc.y = -self.gravity
 
-        print("3update player", self.pos, self.size, self.acc)
         # Kinematic:
         self.vel += self.acc * dt
         self.pos = Vector(self.pos) + self.vel * dt + 0.5 * self.acc * dt ** 2
-        print("4update player", self.pos, self.size, self.acc)
 
 
 class Game(Screen):
@@ -271,9 +268,9 @@ class Game(Screen):
         # scroll:
         scroll = 0
         min_scroll = 200
-        if self.player.x > Window.width * 0.6:
+        if self.player.x > Window.width * 0.5:
             scroll = max(abs(self.player.vel.x), min_scroll) * dt
-        elif self.player.x < Window.width * 0.4:
+        elif self.player.x < Window.width * 0.3:
             scroll =  - max(abs(self.player.vel.x), min_scroll) * dt
         # print(scroll)
         for sprite in self.children:
