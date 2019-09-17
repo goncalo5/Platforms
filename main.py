@@ -77,6 +77,9 @@ class Player(Sprite):
     })
     is_grabbing = kp.BooleanProperty(False)
 
+    # animation:
+    img_i = kp.NumericProperty()
+
     def __init__(self, **kwargs):
         print("__init__ player", self)
         super().__init__(**kwargs)
@@ -98,7 +101,16 @@ class Player(Sprite):
         self.vel = Vector(0, 0)
         self.acc = Vector(0, 0)
         self.on_tile()
+        # animation:
+    #     Clock.schedule_interval(self.animation, .3)
 
+    # def animation(self, dt):
+    #     print("animation")
+    #     # jump:
+    #     if self.is_touching["platform"] or self.is_touching["rock"]:
+    #         self.source = "atlas://Imgs/Player/player/p1_stand"
+    #     else:
+    #         self.source = "atlas://Imgs/Player/player/p1_jump"
 
     def _on_keyboard_down(self, *args):
         # print("_on_keyboard_down", args)
@@ -127,6 +139,7 @@ class Player(Sprite):
         # print("update player", self.pos, self.size, self.acc)
 
         if self.is_touching["platform"] or self.is_touching["rock"]:
+            self.source = "atlas://Imgs/Player/player/p1_stand"
             self.acc = Vector(0, 0)
             self.vel = Vector(0, 0)
             # move horizontally:
@@ -148,6 +161,7 @@ class Player(Sprite):
             # Gravity:
             # print("apply grav")
             self.acc.y = -self.gravity
+            self.source = "atlas://Imgs/Player/player/p1_jump"
         if self.is_grabbing:
             self.acc.y = -self.gravity
 
