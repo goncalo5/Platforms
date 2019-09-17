@@ -20,6 +20,8 @@
     color: settings.COLORS.get("red")
 
 <Game>:
+    label_over: label_over
+    button_over: button_over
     Label:
         text: "fps: %s" % int(root.fps)
         size_hint: None, None
@@ -31,7 +33,8 @@
         x: app.width * 3 / 4
         top: app.height
     Label:
-        text: "%s" % root.game_over_msg
+        id: label_over
+        text: ""
         size_hint: None, None
         center_x: app.width * 0.5
         y: app.height * 0.5
@@ -41,15 +44,16 @@
         center_x: app.width * 0.5
         top: app.height
     Button:
+        id: button_over
         text: "next level"
         size_hint: None, None
         size: self.texture_size
         center_x: app.width * 0.5
         y: app.height * 0.4
-        disabled: not root.win
-        opacity: root.win
+        disabled: 1
+        opacity: 0
         on_press:
-            root.manager.next_level()
+            root.manager.new_game()
 
 <StoreScreen@Screen>
 

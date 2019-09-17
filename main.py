@@ -92,10 +92,17 @@ class Player(Sprite):
         self.app = App.get_running_app()
         self.speed = PLAYER.get("speed") * self.tilesize
 
+    def new(self):
+        self.vel = Vector(0, 0)
+        self.acc = Vector(0, 0)
+        self.on_tile()
+
+
     def _on_keyboard_down(self, *args):
         # print("_on_keyboard_down", args)
         if self.parent.manager.current == "main_menu":
-            self.parent.manager.new_game()
+            self.parent.manager.start_a_game()
+
         code = args[2]
         key = convert_code2key.get(code)
         # print(key)
@@ -115,7 +122,7 @@ class Player(Sprite):
 
 
     def update(self, dt):
-        # print("update player", self.pos, self.size)
+        print("update player", self.pos, self.size, self.acc)
 
         if self.is_touching["platform"] or self.is_touching["rock"]:
             self.acc = Vector(0, 0)
@@ -137,20 +144,22 @@ class Player(Sprite):
                 self.is_touching["platform"] = False
         else:
             # Gravity:
-            # print("apply grav")
+            print("apply grav")
             self.acc.y = -self.gravity
+        print("2update player", self.pos, self.size, self.acc)
         if self.is_grabbing:
             self.acc.y = -self.gravity
 
+        print("3update player", self.pos, self.size, self.acc)
         # Kinematic:
         self.vel += self.acc * dt
         self.pos = Vector(self.pos) + self.vel * dt + 0.5 * self.acc * dt ** 2
+        print("4update player", self.pos, self.size, self.acc)
 
 
 class Game(Screen):
     fps = kp.NumericProperty()
     paused = kp.BooleanProperty(False)
-    game_over_msg = kp.StringProperty()
     win = kp.BooleanProperty(0)
     gold = kp.NumericProperty()
 
@@ -162,6 +171,8 @@ class Game(Screen):
     def new(self, map_name):
         self.paused = False
         self.win = 0
+        self.button_over.opacity = 0
+        self.button_over.disabled = 1
         self.clean_all_sprites()
         # load data:
         self.data = []
@@ -174,7 +185,7 @@ class Game(Screen):
                 if tile == "1":
                     print("player reposition", self.player.pos)
                     self.player.tile = (col, row)
-                    self.player.on_tile()
+                    self.player.new()
                     print(self.player.pos)
                 elif tile == "P":
                     tile = Platform(tile=(col, row))
@@ -193,7 +204,9 @@ class Game(Screen):
         if self.paused:
             return
         self.fps = 1 / dt if abs(1 / dt - self.fps) > 5 else self.fps
-        self.player.update(dt)
+
+        if self.player.top < 0:
+            self.over()
 
         # collisions:
         self.player.is_touching["platform"] = False
@@ -257,10 +270,10 @@ class Game(Screen):
 
         # scroll:
         scroll = 0
-        min_scroll = 100
-        if self.player.x > Window.width * 3 / 4:
+        min_scroll = 200
+        if self.player.x > Window.width * 0.6:
             scroll = max(abs(self.player.vel.x), min_scroll) * dt
-        elif self.player.x < Window.width * 1 / 4:
+        elif self.player.x < Window.width * 0.4:
             scroll =  - max(abs(self.player.vel.x), min_scroll) * dt
         # print(scroll)
         for sprite in self.children:
@@ -268,12 +281,18 @@ class Game(Screen):
                 continue
             sprite.x -= scroll
 
+        self.player.update(dt)
+
     def over(self):
         self.paused = True
+        self.button_over.opacity = 1
+        self.button_over.disabled = 0
         if self.win:
-            self.game_over_msg = "YOU WIN"
+            self.label_over.text = "YOU WIN"
+            self.button_over.text = "next level"
         else:
-            self.game_over_msg = "GAME OVER"
+            self.label_over.text = "GAME OVER"
+            self.button_over.text = "Restart"
 
     def clean_all_sprites(self):
         print("clean_all_sprites")
@@ -281,7 +300,7 @@ class Game(Screen):
             if not isinstance(sprite, Sprite) or sprite == self.player:
                 continue
             self.remove_widget(sprite)
-        self.game_over_msg = ""
+        self.label_over.text = ""
 
 class MetaGame(ScreenManager):
     maps = kp.ListProperty(GAME.get("maps"))
@@ -289,18 +308,21 @@ class MetaGame(ScreenManager):
     # def __init__(self, **kwargs):
     #     super().__init__()
 
-    def new_game(self):
+    def start_a_game(self):
         self.current = "game_screen"
         self.game.new(self.maps[0])
         Clock.schedule_interval(self.game.update, 1 / GAME.get("fps", 60))
 
-    def next_level(self):
-        self.level += 1
+    def new_game(self):
+        if self.game.win:
+            self.level += 1
         if len(self.maps) >= self.level:
             map_name = self.maps[self.level - 1]
             self.game.new(map_name)
         else:
-            self.game.game_over_msg = "YOU END THE GAME!!!"
+            self.game.label_over.text = "YOU END THE GAME!!!"
+            self.game.button_over.opacity = 0
+            self.game.button_over.disabled = 1
             self.game.win = 0
 
 
