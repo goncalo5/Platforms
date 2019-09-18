@@ -3,14 +3,17 @@ from kivy.core.window import Window
 
 class Map(object):
     def __init__(self, filename, tilesize):
+        print("Map filename:%s, tilesize:%s" % (filename, tilesize))
         self.filename = filename
         self.data = []
+        self.tilewidth = 0
         with open(filename, "rt") as f:
             for line in f:
+                line = line.strip()
                 # self.data.append(line.strip().split(","))
-                self.data.append(line.strip())
-    
-        self.tilewidth = len(self.data[0])
+                self.data.append(line)
+                self.tilewidth = max(self.tilewidth, len(line))
+
         self.tilesize = tilesize
         self.width = self.tilewidth * self.tilesize
 

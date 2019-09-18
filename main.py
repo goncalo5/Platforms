@@ -39,7 +39,6 @@ class Sprite(Image):
         self.tile = kwargs.get("tile")
 
     def on_tile(self, *args):
-        print("on_tile")
         self.mapx = self.tile[0] * self.tilesize
         self.y = self.tilesize * self.tile[1]
 
