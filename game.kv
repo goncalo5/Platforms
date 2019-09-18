@@ -19,6 +19,23 @@
 <Flag>:
     color: settings.COLORS.get("red")
 
+<Player>:
+    size_hint: None, None
+    size: self.tilesize, self.tilesize
+    tile: 0, 0
+    x: self.tilesize * self.tile[0]
+    y: self.tilesize * self.tile[1]
+    angle: 0
+    source: "atlas://Imgs/Player/player/p1_stand"
+    Image:
+        size: root.size
+        source: root.source
+        canvas.before:
+            Rotate:
+                axis: 0, 1, 0
+                angle: root.angle
+                origin: self.center
+
 <Game>:
     label_over: label_over
     button_over: button_over

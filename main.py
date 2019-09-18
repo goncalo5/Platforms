@@ -13,6 +13,7 @@ from kivy.clock import Clock
 from kivy.vector import Vector
 # uix:
 from kivy.uix.image import Image
+from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import ScreenManager, Screen
 # self:
 from settings import GAME, PLAYER
@@ -63,7 +64,10 @@ class Flag(Sprite):
         super().__init__(**kwargs)
 
 
-class Player(Sprite):
+class Player(RelativeLayout):
+    tilesize = kp.NumericProperty(Window.height * GAME.get("tilesize", 1 / 12))
+    tile = kp.ListProperty([0, 0])
+    mapx = kp.NumericProperty()
     # constants:
     # speed = kp.NumericProperty(PLAYER.get("speed"))
     jump = kp.NumericProperty(PLAYER.get("jump"))
@@ -83,7 +87,7 @@ class Player(Sprite):
 
     def __init__(self, **kwargs):
         print("__init__ player", self)
-        super().__init__(**kwargs)
+        super().__init__()
         self.source = "atlas://Imgs/Player/player/p1_front"
         self.allow_stretch = True
         print(self.pos, self.size)
@@ -112,6 +116,10 @@ class Player(Sprite):
     #     else:
     #         self.source = "atlas://Imgs/Player/player/p1_jump"
 
+    def on_tile(self, *args):
+        self.mapx = self.tile[0] * self.tilesize
+        self.y = self.tilesize * self.tile[1]
+
     def _on_keyboard_down(self, *args):
         # print("_on_keyboard_down", args)
         if self.parent.manager.current == "main_menu":
@@ -136,7 +144,7 @@ class Player(Sprite):
 
 
     def update(self, dt):
-        # print("update player", self.pos, self.size, self.acc)
+        # print("\nupdate player mapx:%s, pos:%s, size:%s, acc:%s" % (self.mapx, self.pos, self.size, self.acc))
 
         if self.is_touching["platform"] or self.is_touching["rock"]:
             self.source = "atlas://Imgs/Player/player/p1_stand"
@@ -145,8 +153,10 @@ class Player(Sprite):
             # move horizontally:
             if "right" in self.keys:
                 sign = 1
+                self.angle = 0
             elif "left" in self.keys:
                 sign = -1
+                self.angle = 180
             else:
                 sign = 0
             self.vel.x = sign * self.speed
@@ -157,6 +167,7 @@ class Player(Sprite):
                 y = self.jump * self.width
                 self.vel.y = (2 * self.gravity * y) ** 0.5
                 self.is_touching["platform"] = False
+            # print("55 update player mapx:%s, pos:%s, acc:%s" % (self.mapx, self.pos, self.acc))
         else:
             # Gravity:
             # print("apply grav")
@@ -164,12 +175,15 @@ class Player(Sprite):
             self.source = "atlas://Imgs/Player/player/p1_jump"
         if self.is_grabbing:
             self.acc.y = -self.gravity
+        # print("56 update player mapx:%s, pos:%s, vel:%s, acc:%s" % (self.mapx, self.pos, self.vel, self.acc))
 
         # Kinematic:
         self.vel += self.acc * dt
+        # print("57 update player mapx:%s, pos:%s, vel:%s" % (self.mapx, self.pos, self.vel))
         self.mapx += self.vel.x * dt + 0.5 * self.acc.x * dt ** 2
         self.y += self.vel.y * dt + 0.5 * self.acc.y * dt ** 2
 
+        # print("end update player mapx:%s, pos:%s" % (self.mapx, self.pos))
 
 class Game(Screen):
     fps = kp.NumericProperty()
@@ -224,6 +238,7 @@ class Game(Screen):
         # camera:
         self.camera.update(self.player)
         # print(self.camera.offset, self.player.mapx)
+        self.camera.apply(self.player)
         for sprite in self.children:
             if not isinstance(sprite, Sprite):
                 continue
@@ -233,6 +248,7 @@ class Game(Screen):
         self.player.is_touching["platform"] = False
         self.player.is_touching["rock"] = False
         self.player.is_grabbing = False
+        # print("player mapx:%s, pos:%s" % (self.player.mapx, self.player.pos))
         # colissions:
         for sprite in self.children:
             # collision - platforms:
@@ -256,7 +272,7 @@ class Game(Screen):
                     dy2 = abs(self.player.y - sprite.top)
                     dy = min(dy1, dy2)
                     if dx > dy:
-                        # print("vertical", self.player.vel)
+                        # print("vertical", self.player.mapx, self.player.pos)
                         if dy1 < dy2:
                             self.player.top = sprite.y - 1
                             self.player.vel.y *= -1
@@ -265,7 +281,7 @@ class Game(Screen):
                             self.player.vel = Vector(0, 0)
                             self.player.is_touching["rock"] = True
                     else:
-                        # print("horizontal", self.player.vel)
+                        # print("horizontal", self.player.mapx, self.player.pos)
                         if dx1 < dx2:
                             # print("player collide to the right")
                             self.player.mapx = -self.player.width + sprite.mapx
@@ -291,6 +307,8 @@ class Game(Screen):
                     print("WIN")
                     self.win = 1
                     self.over()
+
+        # print("player mapx:%s, pos:%s" % (self.player.mapx, self.player.pos))
 
     def over(self):
         self.paused = True
