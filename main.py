@@ -17,7 +17,7 @@ from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import ScreenManager, Screen
 # self:
 from settings import GAME, PLAYER
-from map import Map, Camera
+from tilemap import Map, Camera
 
 # Window.fullscreen = 'auto'
 
