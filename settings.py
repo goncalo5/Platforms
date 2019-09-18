@@ -9,6 +9,7 @@ GAME = {
     "fps": 60,
     "tilesize": 1 / 12,
     "maps": [
+        # "Levels/test_map.txt",
         "Levels/level1.txt",
         "Levels/level2.txt",
     ]
@@ -16,7 +17,7 @@ GAME = {
 
 
 PLAYER = {
-    "speed": 8,
+    "speed": 10,
     "jump": 4.2,
     "gravity": 2500
 }

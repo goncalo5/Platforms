@@ -16,6 +16,7 @@ from kivy.uix.image import Image
 from kivy.uix.screenmanager import ScreenManager, Screen
 # self:
 from settings import GAME, PLAYER
+from map import Map, Camera
 
 # Window.fullscreen = 'auto'
 
@@ -32,13 +33,14 @@ convert_code2key = {
 class Sprite(Image):
     tilesize = kp.NumericProperty(Window.height * GAME.get("tilesize", 1 / 12))
     tile = kp.ListProperty([0, 0])
+    mapx = kp.NumericProperty()
     def __init__(self, **kwargs):
         super().__init__()
         self.tile = kwargs.get("tile")
 
     def on_tile(self, *args):
         print("on_tile")
-        self.x = self.tilesize * self.tile[0]
+        self.mapx = self.tile[0] * self.tilesize
         self.y = self.tilesize * self.tile[1]
 
 
@@ -90,7 +92,6 @@ class Player(Sprite):
         Window.bind(on_key_up=self._on_keyboard_up)
         self.keys = set()
         Clock.schedule_once(self.after_init, 0)
-        print(55)
 
     def after_init(self, dt):
         print("after_init")
@@ -167,7 +168,8 @@ class Player(Sprite):
 
         # Kinematic:
         self.vel += self.acc * dt
-        self.pos = Vector(self.pos) + self.vel * dt + 0.5 * self.acc * dt ** 2
+        self.mapx += self.vel.x * dt + 0.5 * self.acc.x * dt ** 2
+        self.y += self.vel.y * dt + 0.5 * self.acc.y * dt ** 2
 
 
 class Game(Screen):
@@ -188,12 +190,9 @@ class Game(Screen):
         self.button_over.disabled = 1
         self.clean_all_sprites()
         # load data:
-        self.data = []
-        with open(map_name, "rt") as f:
-            for line in f:
-                self.data.append(line.strip())
-        print("map", self.data)
-        for row, tiles in enumerate(reversed(self.data)):
+        self.map = Map(map_name, self.player.tilesize)
+        print("map", self.map.data)
+        for row, tiles in enumerate(reversed(self.map.data)):
             for col, tile in enumerate(tiles):
                 if tile == "1":
                     print("player reposition", self.player.pos)
@@ -212,19 +211,30 @@ class Game(Screen):
                 elif tile == "F":
                     tile = Flag(tile=(col, row))
                     self.add_widget(tile)
+        self.camera = Camera(self.map.width)
 
     def update(self, dt):
         if self.paused:
             return
         self.fps = 1 / dt if abs(1 / dt - self.fps) > 5 else self.fps
 
+        self.player.update(dt)
         if self.player.top < 0:
             self.over()
+
+        # camera:
+        self.camera.update(self.player)
+        # print(self.camera.offset, self.player.mapx)
+        for sprite in self.children:
+            if not isinstance(sprite, Sprite):
+                continue
+            self.camera.apply(sprite)
 
         # collisions:
         self.player.is_touching["platform"] = False
         self.player.is_touching["rock"] = False
         self.player.is_grabbing = False
+        # colissions:
         for sprite in self.children:
             # collision - platforms:
             if isinstance(sprite, Platform):
@@ -258,12 +268,14 @@ class Game(Screen):
                     else:
                         # print("horizontal", self.player.vel)
                         if dx1 < dx2:
-                            self.player.right = sprite.x
+                            # print("player collide to the right")
+                            self.player.mapx = -self.player.width + sprite.mapx
                             self.player.vel = Vector(0, 0)
                             self.player.is_touching["rock"] = True
                             self.player.is_grabbing = True
                         elif dx1 > dx2:
-                            self.player.x = sprite.right
+                            # print("player collide to the left")
+                            self.player.mapx = sprite.mapx + sprite.width
                             self.player.vel = Vector(0, 0)
                             self.player.is_touching["rock"] = True
                             self.player.is_grabbing = True
@@ -280,21 +292,6 @@ class Game(Screen):
                     print("WIN")
                     self.win = 1
                     self.over()
-
-        # scroll:
-        scroll = 0
-        min_scroll = 500
-        if self.player.x > Window.width * 0.5:
-            scroll = max(abs(self.player.vel.x), min_scroll) * dt
-        elif self.player.x < Window.width * 0.3:
-            scroll =  - max(abs(self.player.vel.x), min_scroll) * dt
-        # print(scroll)
-        for sprite in self.children:
-            if not isinstance(sprite, Sprite):
-                continue
-            sprite.x -= scroll
-
-        self.player.update(dt)
 
     def over(self):
         self.paused = True
