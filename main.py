@@ -83,7 +83,8 @@ class Player(RelativeLayout):
     is_grabbing = kp.BooleanProperty(False)
 
     # animation:
-    img_i = kp.NumericProperty()
+    img_i = kp.NumericProperty(1)
+    is_walking = kp.BooleanProperty(False)
 
     def __init__(self, **kwargs):
         print("__init__ player", self)
@@ -95,26 +96,34 @@ class Player(RelativeLayout):
         Window.bind(on_key_up=self._on_keyboard_up)
         self.keys = set()
         Clock.schedule_once(self.after_init, 0)
+        Clock.schedule_interval(self.update_source, 0.1)
 
     def after_init(self, dt):
         print("after_init")
         self.app = App.get_running_app()
         self.speed = PLAYER.get("speed") * self.tilesize
 
+    def update_source(self, dt):
+        # print("update_source", self.img_i)
+        if not self.is_walking:
+            # print("stop")
+            self.source = "atlas://Imgs/Player/player/p1_stand"
+            return
+        if self.img_i < 10:
+            s = "0%s" % self.img_i
+        else:
+            s = "%s" % self.img_i
+
+        self.source = "atlas://Imgs/Player/player/p1_walk%s" % s
+
+        self.img_i += 1
+        if self.img_i > 11:
+            self.img_i = 1
+
     def new(self):
         self.vel = Vector(0, 0)
         self.acc = Vector(0, 0)
         self.on_tile()
-        # animation:
-    #     Clock.schedule_interval(self.animation, .3)
-
-    # def animation(self, dt):
-    #     print("animation")
-    #     # jump:
-    #     if self.is_touching["platform"] or self.is_touching["rock"]:
-    #         self.source = "atlas://Imgs/Player/player/p1_stand"
-    #     else:
-    #         self.source = "atlas://Imgs/Player/player/p1_jump"
 
     def on_tile(self, *args):
         self.mapx = self.tile[0] * self.tilesize
@@ -147,18 +156,21 @@ class Player(RelativeLayout):
         # print("\nupdate player mapx:%s, pos:%s, size:%s, acc:%s" % (self.mapx, self.pos, self.size, self.acc))
 
         if self.is_touching["platform"] or self.is_touching["rock"]:
-            self.source = "atlas://Imgs/Player/player/p1_stand"
+            # self.source = "atlas://Imgs/Player/player/p1_stand"
             self.acc = Vector(0, 0)
             self.vel = Vector(0, 0)
             # move horizontally:
             if "right" in self.keys:
                 sign = 1
                 self.angle = 0
+                self.is_walking = True
             elif "left" in self.keys:
                 sign = -1
                 self.angle = 180
+                self.is_walking = True
             else:
                 sign = 0
+                self.is_walking = False
             self.vel.x = sign * self.speed
             # print("vel", self.vel)
 
@@ -312,6 +324,7 @@ class Game(Screen):
 
     def over(self):
         self.paused = True
+        self.player.is_walking = False
         self.button_over.opacity = 1
         self.button_over.disabled = 0
         if self.win:
